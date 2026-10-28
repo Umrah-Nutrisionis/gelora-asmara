@@ -1,5 +1,5 @@
 /* Gelora Asmara – service worker: simpan halaman agar bisa dibuka tanpa internet */
-const CACHE="gelora-asmara-d3392bf5";
+const CACHE="gelora-asmara-371d23ed";
 const INTI=["./","./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png","./icon-maskable-512.png","./apple-touch-icon.png"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(INTI)).then(()=>self.skipWaiting()));});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(n=>n!==CACHE).map(n=>caches.delete(n)))).then(()=>self.clients.claim()));});

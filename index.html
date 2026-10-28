@@ -42,7 +42,9 @@
   --ok:#2E7D4F;--ok-soft:#E3F3E8;--mid:#A2620A;--mid-soft:#FBF0D9;--bad:#B3261E;--bad-soft:#FBE4E2;
   --font-display:"Baloo 2", "Trebuchet MS", system-ui, sans-serif;
   --font-body:"Nunito", "Segoe UI", system-ui, sans-serif;
-  --fs:17px;
+  --skala:1;
+  /* ukuran huruf menyesuaikan layar: 17px di ponsel, naik bertahap sampai 20px di komputer */
+  --fs:calc(var(--skala) * clamp(17px, 15.6px + .36vw, 20px));
   --radius:18px;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
@@ -51,7 +53,7 @@
 :root[data-theme="dark"]{
   --bg:#1C1218;--surface:#261A21;--soft:#3A2230;--ink:#F6E9EF;--muted:#C4A9B7;--line:#4A2F3D;
   --kelor:#F27AB0;--kelor-ink:#2A0F1C;--labu:#F0A05A;--labu-soft:#3A2A1C;--laut:#C79BE3;--laut-soft:#33233D;--warn:#F08A66;--ok:#7BD39A;--ok-soft:#1E3326;--mid:#F2C14E;--mid-soft:#3A2F14;--bad:#FF8A80;--bad-soft:#3D1D1C;color-scheme:dark}
-html.besar{--fs:20px}
+html.besar{--skala:1.18}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:var(--fs);line-height:1.6;margin:0}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--surface)}
@@ -275,6 +277,50 @@ textarea{min-height:110px;resize:vertical}
 @media (min-width:640px){.side{grid-template-columns:1fr 1fr}}
 footer{padding-block:10px 30px;color:var(--muted);font-size:.85em}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ===== Penyesuaian tablet dan komputer ===== */
+h1{font-size:clamp(1.75em, 1.45em + 1vw, 2.3em)}
+.hero h1{font-size:clamp(1.9em, 1.5em + 1.6vw, 2.8em)}
+.view.baca{max-width:880px;margin-inline:auto;width:100%}
+.card{align-content:start}
+.kal .dua{align-items:start}
+h1{font-size:clamp(1.85em, 1.5em + 1vw, 2.3em)}
+.topnav a.nav-video{display:none}
+/* tablet (760–1023px): navigasi bawah tetap dipakai agar tombol besar dan mudah disentuh */
+@media (min-width:760px) and (max-width:1023px){
+  .topnav{display:none}
+  .botnav{display:grid;max-width:640px;margin:0 auto;left:0;right:0;border:1px solid var(--line);border-bottom:0;border-radius:18px 18px 0 0}
+  .botnav a{font-size:.8em;padding:8px 4px}
+  .botnav svg{width:26px;height:26px}
+  main{padding-bottom:110px}
+}
+/* hero dua kolom: teks di kiri, foto di kanan */
+@media (min-width:700px){
+  .hero{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);column-gap:28px;padding:32px}
+  .hero .tag{grid-column:1/-1}
+  .hero > div:not(.hero-ilus){grid-column:1;grid-row:2;align-self:center}
+  .hero-ilus{grid-column:2;grid-row:2;width:100%;max-width:340px;justify-self:end;align-self:center}
+}
+/* komputer (≥1024px) */
+@media (min-width:1024px){
+  .wrap{max-width:1120px}
+  .topnav a.nav-video{display:inline-block}
+  .topnav a{padding:8px 14px}
+  main{padding-block:32px 56px}
+  .view{gap:28px}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+  .card{padding:20px}
+  .artikel{padding:32px 36px}
+  .hero{padding:44px 48px;border-radius:28px}
+  .kal form button.hitung{justify-self:start;padding-inline:40px}
+  .kal .hasil{grid-template-columns:repeat(3,1fr)}
+  .kal .hasil .umur,.kal .hasil .saran-gizi{grid-column:1/-1}
+  .video-wrap{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .video-wrap > h2,.video-wrap > .num,.video-wrap > .video-note,.video-wrap > .video-materi{grid-column:1/-1}
+  .cari{padding:20px 24px}
+  footer{text-align:center}
+}
+@media (min-width:1600px){.wrap{max-width:1240px}}
 </style>
 </head>
 <body>
@@ -289,7 +335,7 @@ footer{padding-block:10px 30px;color:var(--muted);font-size:.85em}
       <span><b>Gelora Asmara</b><small>MP-ASI anak 6–24 bulan</small></span>
     </a>
     <nav class="topnav" aria-label="Menu utama">
-      <a href="#beranda">Beranda</a><a href="#materi">Materi</a><a href="#porsi">Porsi</a><a href="#resep">Menu &amp; Resep</a><a href="#tanya">Tanya Ahli Gizi</a>
+      <a href="#beranda">Beranda</a><a href="#materi">Materi</a><a href="#porsi">Porsi</a><a href="#resep">Menu &amp; Resep</a><a href="#video" class="nav-video">Video</a><a href="#tanya">Tanya Ahli Gizi</a>
     </nav>
     <button class="ukuran" id="btnUkuran" aria-pressed="false" title="Perbesar tulisan">A+</button>
   </div>
@@ -882,7 +928,8 @@ function render(){
   if(m){html=V.materiDetail(+m[1]); key="materi";}
   else if(V[h]){html=V[h]();}
   else {html=V.beranda(); key="beranda";}
-  app.innerHTML=`<div class="view">${html}</div><footer>Materi disusun dari Pedoman PMBA (Kemenkes RI, 2020), Buku Saku PMBA (Kemenkes RI, 2021), dan Buku Resep Makanan Lokal Balita (Kemenkes RI, 2022). Gambar dan foto dari Buku Saku PMBA dan Pedoman PMBA Kemenkes RI. Program Gelora Asmara, wilayah kerja Puskesmas Tosiba.</footer>`;
+  const baca=!!m||["tanya","video"].includes(h);
+  app.innerHTML=`<div class="view${baca?" baca":""}">${html}</div><footer>Materi disusun dari Pedoman PMBA (Kemenkes RI, 2020), Buku Saku PMBA (Kemenkes RI, 2021), dan Buku Resep Makanan Lokal Balita (Kemenkes RI, 2022). Gambar dan foto dari Buku Saku PMBA dan Pedoman PMBA Kemenkes RI. Program Gelora Asmara, wilayah kerja Puskesmas Tosiba.</footer>`;
   document.querySelectorAll(".topnav a,.botnav a").forEach(a=>a.setAttribute("aria-current",a.getAttribute("href")==="#"+key?"page":"false"));
   if(key==="beranda"){const f=document.getElementById("fGizi");
     f.addEventListener("input",e=>{const t=e.target;if(t.name)kal[t.name]=t.value;});
